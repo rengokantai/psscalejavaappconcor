@@ -27,8 +27,31 @@ List<Future<Identity>> identitiesHolder = pool.invokeAll(listOfCallables);
 ###31 Throttling
 ```
 ThreadPoolExecutor pool = new ThreadPoolExecutor(5,5,-1,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(capacity),new RejectedExecutionHandler(){
-  public void rejectedExecution()P
+  public void rejectedExecution(){
   }
 });
 ```
 
+###33 Throttling Using Semaphore
+summary
+- Semaphore has a given number of permits that can be issued on its lock
+- Each client blocks at a 'ticket booth', waiting for a permit
+- Only a given number of callers can invoke the method at a time
+
+
+###34 Implementing Throttling
+```
+private Semaphore limiter;
+public void verify(List<Address> address){
+  try{
+    limiter.acquire();
+    try{
+      delegate.verity(address);
+    }finally{
+      limiter.release();
+    }
+  }catch(InterruptedException e){
+    Thread.currentThread.interrupt();
+  }
+}
+```
